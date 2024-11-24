@@ -42,7 +42,7 @@ mechanisms:
         }
         
         set targets to split &ores by ","
-        if not check &event[block.type] in &ores then {
+        if not check &event[block.type] in &targets then {
           exit
         }
 

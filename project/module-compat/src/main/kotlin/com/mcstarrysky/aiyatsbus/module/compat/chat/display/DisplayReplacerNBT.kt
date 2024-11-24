@@ -1,9 +1,25 @@
+/*
+ *  Copyright (C) 2022-2024 SummerIceBearStudio
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package com.mcstarrysky.aiyatsbus.module.compat.chat.display
 
 import com.google.gson.JsonObject
-import com.google.gson.JsonParser
 import com.mcstarrysky.aiyatsbus.core.Aiyatsbus
 import com.mcstarrysky.aiyatsbus.core.toDisplayMode
+import com.mcstarrysky.aiyatsbus.core.util.JSON_PARSER
 import com.mcstarrysky.aiyatsbus.core.util.isValidJson
 import com.mcstarrysky.aiyatsbus.module.compat.chat.DisplayReplacer
 import net.kyori.adventure.text.Component
@@ -64,7 +80,7 @@ object DisplayReplacerNBT : DisplayReplacer {
     }
 
     private fun extractHoverEvents(jsonString: String): List<JsonObject> {
-        val jsonObject = JsonParser.parseString(jsonString).asJsonObject
+        val jsonObject = JSON_PARSER.parse(jsonString).asJsonObject
         val hoverEvents = mutableListOf<JsonObject>()
 
         findHoverEvents(jsonObject, hoverEvents)

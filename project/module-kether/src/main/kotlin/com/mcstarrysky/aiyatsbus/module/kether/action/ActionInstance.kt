@@ -1,3 +1,19 @@
+/*
+ *  Copyright (C) 2022-2024 SummerIceBearStudio
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package com.mcstarrysky.aiyatsbus.module.kether.action
 
 import taboolib.module.kether.KetherParser
@@ -23,11 +39,13 @@ object ActionInstance {
         it.group(any(), command("is", then = text())).apply(it) { obj, cast ->
             now {
                 // 尝试避免 ClassNotFoundException
-                kotlin.runCatching {
+                try {
                     // 缓存
                     val clazz = cache.computeIfAbsent(cast) { Class.forName(cast) }
                     clazz.isInstance(obj)
-                }.getOrElse { false }
+                } catch (_: Throwable) {
+                    false
+                }
             }
         }
     }
@@ -40,11 +58,13 @@ object ActionInstance {
         it.group(any(), command("to", then = text())).apply(it) { obj, cast ->
             now {
                 // 尝试避免 ClassNotFoundException
-                kotlin.runCatching {
+                try {
                     // 缓存
                     val clazz = cache.computeIfAbsent(cast) { Class.forName(cast) }
                     clazz.cast(obj)
-                }.getOrElse { obj }
+                } catch (_: Throwable) {
+                    obj
+                }
             }
         }
     }

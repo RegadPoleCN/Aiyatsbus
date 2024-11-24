@@ -1,16 +1,35 @@
+/*
+ *  Copyright (C) 2022-2024 SummerIceBearStudio
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package com.mcstarrysky.aiyatsbus.module.kether.action.game
 
 import com.mcstarrysky.aiyatsbus.core.util.Vectors
 import com.mcstarrysky.aiyatsbus.core.util.isBehind
 import com.mcstarrysky.aiyatsbus.core.util.realDamage
 import org.bukkit.Location
+import org.bukkit.entity.Arrow
 import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
+import org.bukkit.projectiles.ProjectileSource
 import org.bukkit.util.Vector
+import taboolib.common.platform.function.submit
 import taboolib.module.kether.KetherParser
 import taboolib.module.kether.combinationParser
 import taboolib.module.kether.player
@@ -113,6 +132,17 @@ object ActionEntity {
     fun actionEntityIsBehind() = combinationParser {
         it.group(type<LivingEntity>(), type<LivingEntity>()).apply(it) { entity1, entity2 ->
             now { entity1.isBehind(entity2) }
+        }
+    }
+
+    @KetherParser(["launchArrow", "launch-arrow"], shared = true)
+    fun actionLaunchProjectile() = combinationParser {
+        it.group(type<ProjectileSource>(), command("with", then = type<Vector>()).option()).apply(it) { source, vector ->
+            now {
+                submit {
+                    source.launchProjectile(Arrow::class.java, vector)
+                }
+            }
         }
     }
 }

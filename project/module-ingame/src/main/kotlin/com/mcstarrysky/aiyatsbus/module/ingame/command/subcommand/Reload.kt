@@ -1,3 +1,19 @@
+/*
+ *  Copyright (C) 2022-2024 SummerIceBearStudio
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package com.mcstarrysky.aiyatsbus.module.ingame.command.subcommand
 
 import com.mcstarrysky.aiyatsbus.core.*
@@ -10,6 +26,7 @@ import com.mcstarrysky.aiyatsbus.module.ingame.mechanics.*
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import taboolib.common.platform.command.subCommand
+import taboolib.common.util.ResettableLazy
 import taboolib.module.lang.Language
 import taboolib.platform.util.onlinePlayers
 
@@ -35,6 +52,7 @@ val reloadSubCommand = subCommand {
         VillagerSupport.conf.reload()
         onlinePlayers.forEach(Player::updateInventory)
         AiyatsbusCommand.init() // 重新生成 TabList
+        ResettableLazy.reset()
         sender.sendLang("plugin-reload", System.currentTimeMillis() - time)
         EnchantRegistrationHooks.unregisterHooks()
         EnchantRegistrationHooks.registerHooks()

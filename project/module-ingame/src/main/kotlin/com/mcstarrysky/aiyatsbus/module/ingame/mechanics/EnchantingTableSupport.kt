@@ -1,5 +1,21 @@
 @file:Suppress("DuplicatedCode")
 
+/*
+ *  Copyright (C) 2022-2024 SummerIceBearStudio
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package com.mcstarrysky.aiyatsbus.module.ingame.mechanics
 
 import com.mcstarrysky.aiyatsbus.core.*
@@ -97,6 +113,15 @@ object EnchantingTableSupport {
          * Spigot.Deobf -> PacketPlayerOutWindowData
          * Paper -> ClientboundContainerSetDataPacket
          *
+         * containerId (Enchanting Table):
+         * Field:
+         *   1.16 -> a
+         *   1.17 -> 1.21.1 -> containerId
+         *   paper (universal craftbukkit) -> containerId (remap = false)
+         * Value:
+         *   1.16 ~ 1.20.2 -> 12 https://wiki.vg/index.php?title=Inventory&oldid=16948
+         *   1.20.3 ~ 1.21.2 -> 13 (+ Crafter since 23w42a) https://wiki.vg/index.php?title=Inventory&oldid=18722
+         *
          * id:
          * 1.16 -> b
          * 1.17 ~ 1.21.1 -> id (remap = true)
@@ -111,7 +136,9 @@ object EnchantingTableSupport {
          */
         if (e.packet.name == "PacketPlayOutWindowData" || e.packet.name == "ClientboundContainerSetDataPacket") {
             try {
-                val id = e.packet.read<Int>(if (MinecraftVersion.isUniversal) "id" else "value", MinecraftVersion.isUniversal)
+                val containerId = e.packet.read<Int>(if (MinecraftVersion.isUniversal) "containerId" else "a", MinecraftVersion.isUniversal)
+                if (!checkEnchantingTable(containerId)) return
+                val id = e.packet.read<Int>(if (MinecraftVersion.isUniversal) "id" else "b", MinecraftVersion.isUniversal)
                 if (id in 4..6) {
                     e.packet.write(if (MinecraftVersion.isUniversal) "value" else "c", -1)
                 }
@@ -119,6 +146,11 @@ object EnchantingTableSupport {
                 e.printStackTrace()
             }
         }
+    }
+
+    private fun checkEnchantingTable(containerId: Int?): Boolean {
+        return MinecraftVersion.versionId <= 12002 && containerId == 12 ||
+                MinecraftVersion.versionId >= 12003 && containerId == 13
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, ignoreCancelled = true)

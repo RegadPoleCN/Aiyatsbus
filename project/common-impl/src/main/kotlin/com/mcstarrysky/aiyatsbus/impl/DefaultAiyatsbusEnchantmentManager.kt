@@ -1,3 +1,19 @@
+/*
+ *  Copyright (C) 2022-2024 SummerIceBearStudio
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package com.mcstarrysky.aiyatsbus.impl
 
 import com.mcstarrysky.aiyatsbus.core.*
@@ -14,6 +30,7 @@ import com.mcstarrysky.aiyatsbus.impl.enchant.InternalAiyatsbusEnchantment
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
 import taboolib.common.LifeCycle
+import taboolib.common.UnsupportedVersionException
 import taboolib.common.io.newFolder
 import taboolib.common.io.runningResourcesInJar
 import taboolib.common.platform.Awake
@@ -145,12 +162,12 @@ class DefaultAiyatsbusEnchantmentManager : AiyatsbusEnchantmentManager {
         @Awake(LifeCycle.CONST)
         fun init() {
             PlatformFactory.registerAPI<AiyatsbusEnchantmentManager>(DefaultAiyatsbusEnchantmentManager())
-            val registerer = if (MinecraftVersion.majorLegacy >= 12100) {
-                nmsProxy<ModernEnchantmentRegisterer>("com.mcstarrysky.aiyatsbus.impl.registration.v12100_nms.DefaultModernEnchantmentRegisterer")
-            } else if (MinecraftVersion.majorLegacy >= 12003) {
-                nmsProxy<ModernEnchantmentRegisterer>("com.mcstarrysky.aiyatsbus.impl.registration.v12004_nms.DefaultModernEnchantmentRegisterer")
-            } else {
-                return
+            val registerer: ModernEnchantmentRegisterer = when {
+                MinecraftVersion.versionId >= 12102 -> nmsProxy("com.mcstarrysky.aiyatsbus.impl.registration.v12103_nms.DefaultModernEnchantmentRegisterer")
+                MinecraftVersion.versionId >= 12100 -> nmsProxy("com.mcstarrysky.aiyatsbus.impl.registration.v12100_nms.DefaultModernEnchantmentRegisterer")
+                MinecraftVersion.versionId >= 12005 -> throw UnsupportedVersionException()
+                MinecraftVersion.versionId >= 12003 -> nmsProxy("com.mcstarrysky.aiyatsbus.impl.registration.v12004_nms.DefaultModernEnchantmentRegisterer")
+                else -> return
             }
             registerer.replaceRegistry()
             registerLifeCycleTask(LifeCycle.ACTIVE) {

@@ -20,9 +20,13 @@ include("project:module-nms:nms-common")
 include("project:module-nms:nms-v12005")
 // 旧版本自定义附魔注册器
 include("project:module-registration:registration-legacy")
-// 1.20.4 自定义附魔注册器
+// 1.20.4 (1.20.3) 自定义附魔注册器
 include("project:module-registration:registration-v12004-paper")
 include("project:module-registration:registration-v12004-vanilla")
+// 跳过 1.20.5, 1.20.6
 // 1.21 自定义附魔注册器
 include("project:module-registration:registration-v12100-paper")
 include("project:module-registration:registration-v12100-vanilla")
+// 1.21.3 (1.20.2) 自定义附魔注册器
+include("project:module-registration:registration-v12103-paper")
+include("project:module-registration:registration-v12103-vanilla")

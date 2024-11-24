@@ -1,3 +1,19 @@
+/*
+ *  Copyright (C) 2022-2024 SummerIceBearStudio
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package com.mcstarrysky.aiyatsbus.impl
 
 import com.google.common.collect.HashBasedTable
@@ -6,6 +22,7 @@ import com.mcstarrysky.aiyatsbus.core.*
 import com.mcstarrysky.aiyatsbus.core.data.CheckType
 import com.mcstarrysky.aiyatsbus.core.data.trigger.event.EventMapping
 import com.mcstarrysky.aiyatsbus.core.data.trigger.event.EventResolver
+import com.mcstarrysky.aiyatsbus.core.event.AiyatsbusBowChargeEvent
 import com.mcstarrysky.aiyatsbus.core.event.AiyatsbusPrepareAnvilEvent
 import com.mcstarrysky.aiyatsbus.core.util.*
 import com.mcstarrysky.aiyatsbus.core.util.inject.Reloadable
@@ -15,6 +32,7 @@ import org.bukkit.entity.Player
 import org.bukkit.entity.Projectile
 import org.bukkit.event.Event
 import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.event.block.BlockDamageEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDeathEvent
@@ -80,6 +98,7 @@ class DefaultAiyatsbusEventExecutor : AiyatsbusEventExecutor {
                 if (event.from.world == event.to.world && event.from.distance(event.to) < 1e-1) return@EventResolver
             }
         )
+        resolvers += BlockDamageEvent::class.java to EventResolver<BlockDamageEvent>({ event, _ -> event.player.checkedIfIsNPC() })
         resolvers += BlockPlaceEvent::class.java to EventResolver<BlockPlaceEvent>({ event, _ -> event.player.checkedIfIsNPC() })
         resolvers += BlockBreakEvent::class.java to EventResolver<BlockBreakEvent>({ event, _ -> event.player.checkedIfIsNPC() })
         resolvers += ProjectileHitEvent::class.java to EventResolver<ProjectileHitEvent>({ event, _ -> (event.entity.shooter as? LivingEntity).checkedIfIsNPC() })
@@ -113,6 +132,8 @@ class DefaultAiyatsbusEventExecutor : AiyatsbusEventExecutor {
                 }
             }
         )
+        resolvers += AiyatsbusBowChargeEvent.Prepare::class.java to EventResolver<AiyatsbusBowChargeEvent.Prepare>({ event, _ -> (event.player).checkedIfIsNPC() })
+        resolvers += AiyatsbusBowChargeEvent.Released::class.java to EventResolver<AiyatsbusBowChargeEvent.Released>({ event, _ -> (event.player).checkedIfIsNPC() })
     }
 
     override fun registerListener(listen: String, eventMapping: EventMapping) {
